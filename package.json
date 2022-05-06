@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "http-errors": "~2.0.0",
+    "memory-cache": "~0.2.0",
+    "request": "~2.88.0"
+  },
+  "description": "The DHL ECOMMERCE SOLUTIONS AMERICAS API is your one stop solution to get shipping products, calculating duty and tax, generating shipping labels, manifesting packages, requesting shipment pickup, tracking packages and generating return labels.",
+  "devDependencies": {
+    "coveralls": "*",
+    "mocha": "*",
+    "nyc": "*"
+  },
+  "keywords": [
+    "logistics",
+    "dhl",
+    "shipping",
+    "tracking",
+    "zpl"
+  ],
+  "license": "Apache-2.0",
+  "name": "dhl-ecommerce-solutions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mediocre/dhl-ecommerce-solutions.git"
+  },
+  "scripts": {
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "test": "mocha --exit --reporter spec test"
+  },
+  "version": "0.0.1"
+}
