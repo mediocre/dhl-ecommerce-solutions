@@ -4,8 +4,6 @@ const request = require('request');
 
 function DhlEcommerceSolutions(args) {
     const options = Object.assign({
-        client_id: '',
-        client_secret: '',
         environmentUrl: 'https://api-sandbox.dhlecs.com'
     }, args);
 
