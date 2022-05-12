@@ -40,11 +40,11 @@ describe('DhlEcommerceSolutions.findProducts', function() {
             });
 
             // Update cache
-            cache.put('invalid/oauth/token', accessToken, accessToken.expires_in * 1000 / 2);
+            cache.put('invalid/auth/v4/accesstoken?client_id=undefined', accessToken, accessToken.expires_in * 1000 / 2);
 
             dhlEcommerceSolutions.findProducts({}, function(err, response) {
                 assert(err);
-                assert.strictEqual(err.message, 'Invalid URI "invalid/auth/v4/accesstoken"');
+                assert.strictEqual(err.message, 'Invalid URI "invalid/shipping/v4/products"');
                 assert.strictEqual(err.status, undefined);
                 assert.strictEqual(response, undefined);
 
