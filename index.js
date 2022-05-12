@@ -49,6 +49,37 @@ function DhlEcommerceSolutions(args) {
             callback(null, body);
         });
     };
+
+    /**
+     * DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates.
+     */
+    this.findProducts = function(_request, callback) {
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: _request,
+                url: `${options.environmentUrl}/shipping/v4/products`
+            };
+
+            request.post(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    return callback(createError(res.statusCode));
+                }
+
+                callback(null, response);
+            });
+        });
+    };
 }
 
 module.exports = DhlEcommerceSolutions;
