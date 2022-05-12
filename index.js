@@ -17,7 +17,7 @@ function DhlEcommerceSolutions(args) {
         const key = `${url}?client_id=${options.client_id}`;
 
         // Try to get the access token from memory cache
-        const accessToken = cache.get(url);
+        const accessToken = cache.get(key);
 
         if (accessToken) {
             return callback(null, accessToken);
@@ -25,6 +25,8 @@ function DhlEcommerceSolutions(args) {
 
         const req = {
             form: {
+                client_id: options.client_id,
+                client_secret: options.client_secret,
                 grant_type: 'client_credentials'
             },
             headers: {

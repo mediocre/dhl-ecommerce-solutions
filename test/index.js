@@ -43,7 +43,7 @@ describe('DhlEcommerceSolutions.getAccessToken', function() {
         });
     });
 
-    it.skip('should return a valid access token', function(done) {
+    it('should return a valid access token', function(done) {
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -56,13 +56,13 @@ describe('DhlEcommerceSolutions.getAccessToken', function() {
             assert(accessToken.access_token);
             assert(accessToken.client_id);
             assert(accessToken.expires_in);
-            assert.strictEqual(accessToken.token_type, 'BearerToken');
+            assert.strictEqual(accessToken.token_type, 'Bearer');
 
             done();
         });
     });
 
-    it.skip('should return the same access token on subsequent calls', function(done) {
+    it('should return the same access token on subsequent calls', function(done) {
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
