@@ -19,6 +19,51 @@ const dhlEcommerceSolutions = new DhlEcommerceSolutions({
 });
 ```
 
+### dhlEcommerceSolutions.createLabel(request, options, callback)
+
+The Label endpoint can generate a US Domestic or an International label.
+
+https://docs.api.dhlecs.com/?version=latest#be69c425-2003-4632-8da1-0303642087d0
+
+**Example**
+
+```javascript
+const request = {
+    consigneeAddress: {
+        address1: '114 Whitney Ave',
+        city: 'New Haven',
+        country: 'US',
+        name: 'John Doe',
+        postalCode: '06510',
+        state: 'CT'
+    },
+    distributionCenter: 'USDFW1',
+    orderedProductId: 'GND',
+    packageDetail: {
+        packageDescription: 'ORDER NO 20483739DFDR',
+        packageId: crypto.randomUUID().substring(0, 30),
+        weight: {
+            unitOfMeasure: 'LB',
+            value: 3
+        }
+    },
+    pickup: '5351244',
+    returnAddress: {
+        address1: '4717 Plano Parkway',
+        address2: 'Suite 130',
+        city: 'Carrollton',
+        companyName: 'Mercatalyst',
+        country: 'US',
+        postalCode: '75010',
+        state: 'TX'
+    }
+};
+
+dhlEcommerceSolutions.createLabel(request, { format: 'PNG' }, function(err, response) {
+    console.log(response);
+});
+```
+
 ### dhlEcommerceSolutions.findProducts(request, callback)
 
 DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates (EDD).
