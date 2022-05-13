@@ -53,6 +53,40 @@ function DhlEcommerceSolutions(args) {
     };
 
     /**
+     * DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates.
+     */
+     this.findProducts = function(_request, callback) {
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: _request,
+                url: `${options.environmentUrl}/shipping/v4/products`
+            };
+
+            request.post(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    const err = createError(res.statusCode);
+                    err.response = response;
+
+                    return callback(err);
+                }
+
+                callback(null, response);
+            });
+        });
+    };
+
+    /**
      * To access any of DHL eCommerce's API resources, client credentials (clientId and clientSecret) are required which must be exchanged for an access token.
      */
     this.getAccessToken = function(callback) {
@@ -99,9 +133,9 @@ function DhlEcommerceSolutions(args) {
     };
 
     /**
-     * DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates.
+     * Track using a single packageId.
      */
-    this.findProducts = function(_request, callback) {
+    this.getTrackingByPackageId = function(packageId, callback) {
         this.getAccessToken(function(err, accessToken) {
             if (err) {
                 return callback(err);
@@ -111,11 +145,11 @@ function DhlEcommerceSolutions(args) {
                 auth: {
                     bearer: accessToken.access_token
                 },
-                json: _request,
-                url: `${options.environmentUrl}/shipping/v4/products`
+                json: true,
+                url: `${options.environmentUrl}/tracking/v4/package?packageId=${packageId}`
             };
 
-            request.post(req, function(err, res, response) {
+            request.get(req, function(err, res, response) {
                 if (err) {
                     return callback(err);
                 }

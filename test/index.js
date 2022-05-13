@@ -401,3 +401,91 @@ describe('DhlEcommerceSolutions.getAccessToken', function() {
         });
     });
 });
+
+describe('DhlEcommerceSolutions.getTrackingByPackageId', function() {
+    this.timeout(5000);
+
+    beforeEach(function() {
+        cache.clear();
+    });
+
+    it('should return an error for invalid environmentUrl', function(done) {
+        const dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            environmentUrl: 'invalid'
+        });
+
+        dhlEcommerceSolutions.getTrackingByPackageId('V4-TEST-1586965592482', function(err, response) {
+            assert(err);
+            assert.strictEqual(err.message, 'Invalid URI "invalid/auth/v4/accesstoken"');
+            assert.strictEqual(err.status, undefined);
+            assert.strictEqual(response, undefined);
+
+            done();
+        });
+    });
+
+    it('should return an error for invalid environmentUrl', function(done) {
+        var dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        dhlEcommerceSolutions.getAccessToken(function(err, accessToken) {
+            assert.ifError(err);
+
+            dhlEcommerceSolutions = new DhlEcommerceSolutions({
+                environmentUrl: 'invalid'
+            });
+
+            // Update cache
+            cache.put('invalid/auth/v4/accesstoken?client_id=undefined', accessToken, accessToken.expires_in * 1000 / 2);
+
+            dhlEcommerceSolutions.getTrackingByPackageId('V4-TEST-1586965592482', function(err, response) {
+                assert(err);
+                assert.strictEqual(err.message, 'Invalid URI "invalid/tracking/v4/package?packageId=V4-TEST-1586965592482"');
+                assert.strictEqual(err.status, undefined);
+                assert.strictEqual(response, undefined);
+
+                done();
+            });
+        });
+    });
+
+    it('should return an error for non 200 status code', function(done) {
+        var dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        dhlEcommerceSolutions.getAccessToken(function(err) {
+            assert.ifError(err);
+
+            dhlEcommerceSolutions = new DhlEcommerceSolutions({
+                environmentUrl: 'https://httpbin.org/status/500#'
+            });
+
+            dhlEcommerceSolutions.getTrackingByPackageId('V4-TEST-1586965592482', function(err, response) {
+                assert(err);
+                assert.strictEqual(err.message, 'Internal Server Error');
+                assert.strictEqual(err.status, 500);
+                assert.strictEqual(response, undefined);
+
+                done();
+            });
+        });
+    });
+
+    it('should return a response', function(done) {
+        const dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        dhlEcommerceSolutions.getTrackingByPackageId('V4-TEST-1586965592482', function(err, response) {
+            assert.ifError(err);
+            assert.strictEqual(response.packages.length, 0);
+
+            done();
+        });
+    });
+});

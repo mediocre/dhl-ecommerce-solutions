@@ -125,3 +125,17 @@ dhlEcommerceSolutions.getAccessToken(function(err, accessToken) {
     console.log(accessToken);
 });
 ```
+
+### dhlEcommerceSolutions.getTrackingByPackageId(packageId, callback)
+
+This API is used to check the latest tracking status of any domestic or international package.
+
+https://docs.api.dhlecs.com/?version=latest#bc8f6e5c-1bb2-45b9-8731-2a7feb5c71c7
+
+**Example**
+
+```javascript
+dhlEcommerceSolutions.getTrackingByPackageId('V4-TEST-1586965592482', function(err, response) {
+    console.log(response);
+});
+```
