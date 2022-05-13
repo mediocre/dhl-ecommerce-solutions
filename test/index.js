@@ -457,8 +457,11 @@ describe('DhlEcommerceSolutions.getTrackingByPackageId', function() {
             client_secret: process.env.CLIENT_SECRET
         });
 
-        dhlEcommerceSolutions.getAccessToken(function(err) {
+        dhlEcommerceSolutions.getAccessToken(function(err, accessToken) {
             assert.ifError(err);
+
+            // Update cache
+            cache.put('https://httpbin.org/status/500#/auth/v4/accesstoken?client_id=undefined', accessToken, accessToken.expires_in * 1000 / 2);
 
             dhlEcommerceSolutions = new DhlEcommerceSolutions({
                 environmentUrl: 'https://httpbin.org/status/500#'
