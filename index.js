@@ -58,7 +58,34 @@ function DhlEcommerceSolutions(args) {
      */
 
     this.createManifest = function(_request, callback) {
-        return callback('Not implemented.');
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: _request,
+                url: `${options.environmentUrl}/shipping/v4/manifest`
+            };
+
+            request.post(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    const err = createError(res.statusCode);
+                    err.response = response;
+
+                    return callback(err);
+                }
+
+                callback(null, response);
+            });
+        });
     };
 
     /**
