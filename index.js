@@ -89,6 +89,40 @@ function DhlEcommerceSolutions(args) {
     };
 
     /**
+     * The Download Manifest API is used to retrieve and download the manifests that were created using the Create Manifest API.
+     */
+    this.downloadManifest = function(_request, callback) {
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: true,
+                url: `${options.environmentUrl}/shipping/v4/manifest/${_request.pickup}/${_request.requestId}`
+            };
+
+            request.get(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    const err = createError(res.statusCode);
+                    err.response = response;
+
+                    return callback(err);
+                }
+
+                callback(null, response);
+            });
+        });
+    };
+
+    /**
      * DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates.
      */
      this.findProducts = function(_request, callback) {

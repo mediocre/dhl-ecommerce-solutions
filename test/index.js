@@ -579,10 +579,120 @@ describe('DhlEcommerceSolutions.createManifest', function() {
             assert.ifError(err);
 
             assert.ok(response.timestamp);
+            assert.notStrictEqual(NaN, Date.parse(response.timestamp));
             assert.ok(response.requestId);
             assert.ok(response.link);
 
             done();
+        });
+    });
+});
+
+
+describe('DhlEcommerceSolutions.createManifest', function() {
+    this.timeout(30000);
+
+    beforeEach(function() {
+        cache.clear();
+    });
+
+    it('should return an error for invalid environmentUrl', function(done) {
+        const dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            environmentUrl: 'invalid'
+        });
+
+        dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+            assert(err);
+            assert.strictEqual(err.message, 'Invalid URI "invalid/auth/v4/accesstoken"');
+            assert.strictEqual(err.status, undefined);
+            assert.strictEqual(response, undefined);
+
+            done();
+        });
+    });
+
+    it('should return an error for invalid environmentUrl', function(done) {
+        var dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        dhlEcommerceSolutions.getAccessToken(function(err, accessToken) {
+            assert.ifError(err);
+
+            // Update cache
+            cache.put('invalid/auth/v4/accesstoken?client_id=undefined', accessToken, accessToken.expires_in * 1000 / 2);
+
+            dhlEcommerceSolutions = new DhlEcommerceSolutions({
+                environmentUrl: 'invalid'
+            });
+
+            dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+                assert(err);
+                assert.strictEqual(err.message, 'Invalid URI "invalid/shipping/v4/manifest/5351244/b56fe9d0-1111-2222-a11f-f8f8635f985a"');
+                assert.strictEqual(err.status, undefined);
+                assert.strictEqual(response, undefined);
+
+                done();
+            });
+        });
+    });
+
+    it('should return an error for non 200 status code', function(done) {
+        var dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        dhlEcommerceSolutions.getAccessToken(function(err, accessToken) {
+            assert.ifError(err);
+
+            // Update cache
+            cache.put('https://httpbin.org/status/500#/auth/v4/accesstoken?client_id=undefined', accessToken, accessToken.expires_in * 1000 / 2);
+
+            dhlEcommerceSolutions = new DhlEcommerceSolutions({
+                environmentUrl: 'https://httpbin.org/status/500#'
+            });
+
+            dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+                assert(err);
+                assert.strictEqual(err.message, 'Internal Server Error');
+                assert.strictEqual(err.status, 500);
+                assert.strictEqual(response, undefined);
+
+                done();
+            });
+        });
+    });
+
+    it('should return a response', function(done) {
+        const dhlEcommerceSolutions = new DhlEcommerceSolutions({
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET
+        });
+
+        const accountNumber = '5351244';
+
+        dhlEcommerceSolutions.createManifest({ manifests: [], pickup: accountNumber }, function(err, response) {
+            assert.ifError(err);
+            assert.ok(response.requestId);
+
+            const manifestRequestId = response.requestId;
+
+            dhlEcommerceSolutions.downloadManifest({ pickup: accountNumber, requestId: manifestRequestId }, function(err, response) {
+                assert.ifError(err);
+                assert.ifError(response.errorCode);
+                assert.ifError(response.errorDescription);
+
+                assert.ok(response.manifestSummary);
+                assert(Number.isInteger(response.manifestSummary.total));
+                assert.strictEqual(accountNumber, response.pickup);
+                assert.strictEqual(manifestRequestId, response.requestId);
+                assert.strictEqual('COMPLETED', response.status);
+                assert.notStrictEqual(NaN, Date.parse(response.timestamp));
+
+                done();
+            });
         });
     });
 });
