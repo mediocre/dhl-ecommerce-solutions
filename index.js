@@ -4,7 +4,7 @@ const request = require('request');
 
 function DhlEcommerceSolutions(args) {
     const options = Object.assign({
-        environmentUrl: 'https://api-sandbox.dhlecs.com'
+        environment_url: 'https://api-sandbox.dhlecs.com'
     }, args);
 
     /**
@@ -32,7 +32,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: _request,
-                url: `${options.environmentUrl}/shipping/v4/label?format=${_options.format}`
+                url: `${options.environment_url}/shipping/v4/label?format=${_options.format}`
             };
 
             request.post(req, function(err, res, response) {
@@ -56,7 +56,6 @@ function DhlEcommerceSolutions(args) {
      * Manifest specific open packages (recommended): Only packages specified in the request are added to a request id and only those items will be manifested.
      * Manifest all open items: The last 20,000 labels generated for the given pickup location are added to a request id and will be manifested.
      */
-
     this.createManifest = function(_request, callback) {
         this.getAccessToken(function(err, accessToken) {
             if (err) {
@@ -68,7 +67,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: _request,
-                url: `${options.environmentUrl}/shipping/v4/manifest`
+                url: `${options.environment_url}/shipping/v4/manifest`
             };
 
             request.post(req, function(err, res, response) {
@@ -102,7 +101,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: true,
-                url: `${options.environmentUrl}/shipping/v4/manifest/${_request.pickup}/${_request.requestId}`
+                url: `${options.environment_url}/shipping/v4/manifest/${_request.pickup}/${_request.requestId}`
             };
 
             request.get(req, function(err, res, response) {
@@ -136,7 +135,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: _request,
-                url: `${options.environmentUrl}/shipping/v4/products`
+                url: `${options.environment_url}/shipping/v4/products`
             };
 
             request.post(req, function(err, res, response) {
@@ -160,7 +159,7 @@ function DhlEcommerceSolutions(args) {
      * To access any of DHL eCommerce's API resources, client credentials (clientId and clientSecret) are required which must be exchanged for an access token.
      */
     this.getAccessToken = function(callback) {
-        const url = `${options.environmentUrl}/auth/v4/accesstoken`;
+        const url = `${options.environment_url}/auth/v4/accesstoken`;
         const key = `${url}?client_id=${options.client_id}`;
 
         // Try to get the access token from memory cache
@@ -216,7 +215,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: true,
-                url: `${options.environmentUrl}/tracking/v4/package?packageId=${packageId}`
+                url: `${options.environment_url}/tracking/v4/package?packageId=${packageId}`
             };
 
             request.get(req, function(err, res, response) {

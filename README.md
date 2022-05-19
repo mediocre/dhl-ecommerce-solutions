@@ -15,7 +15,7 @@ const DhlEcommerceSolutions = require('dhl-ecommerce-solutions');
 const dhlEcommerceSolutions = new DhlEcommerceSolutions({
     client_id: 'your_api_key',
     client_secret: 'your_api_secret',
-    environmentUrl: 'https://api-sandbox.dhlecs.com'
+    environment_url: 'https://api-sandbox.dhlecs.com'
 });
 ```
 
