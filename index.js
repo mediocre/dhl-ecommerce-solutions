@@ -88,9 +88,11 @@ function DhlEcommerceSolutions(args) {
     };
 
     /**
-     * The Download Manifest API is used to retrieve and download the manifests that were created using the Create Manifest API.
+     * The Dowload Manifest API is used to retrieve and download the manifests that were created using the Create Manifest API.
+     * @param {string} pickup DHL eCommerce pickup account number. You will receive this after doing the onboarding with DHL sales
+     * @param {string} requestId DHL eCommerce manifest request ID that was provided in the POST manifest response object
      */
-    this.downloadManifest = function(_request, callback) {
+    this.downloadManifest = function(pickup, requestId, callback) {
         this.getAccessToken(function(err, accessToken) {
             if (err) {
                 return callback(err);
@@ -101,7 +103,7 @@ function DhlEcommerceSolutions(args) {
                     bearer: accessToken.access_token
                 },
                 json: true,
-                url: `${options.environment_url}/shipping/v4/manifest/${_request.pickup}/${_request.requestId}`
+                url: `${options.environment_url}/shipping/v4/manifest/${pickup}/${requestId}`
             };
 
             request.get(req, function(err, res, response) {

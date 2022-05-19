@@ -295,7 +295,7 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
             environment_url: 'invalid'
         });
 
-        dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+        dhlEcommerceSolutions.downloadManifest('5351244', 'b56fe9d0-1111-2222-a11f-f8f8635f985a', function(err, response) {
             assert(err);
             assert.strictEqual(err.message, 'Invalid URI "invalid/auth/v4/accesstoken"');
             assert.strictEqual(err.status, undefined);
@@ -321,7 +321,7 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
                 environment_url: 'invalid'
             });
 
-            dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+            dhlEcommerceSolutions.downloadManifest('5351244', 'b56fe9d0-1111-2222-a11f-f8f8635f985a', function(err, response) {
                 assert(err);
                 assert.strictEqual(err.message, 'Invalid URI "invalid/shipping/v4/manifest/5351244/b56fe9d0-1111-2222-a11f-f8f8635f985a"');
                 assert.strictEqual(err.status, undefined);
@@ -348,7 +348,7 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
                 environment_url: 'https://httpbin.org/status/500#'
             });
 
-            dhlEcommerceSolutions.downloadManifest({ pickup: '5351244', requestId: 'b56fe9d0-1111-2222-a11f-f8f8635f985a' }, function(err, response) {
+            dhlEcommerceSolutions.downloadManifest('5351244', 'b56fe9d0-1111-2222-a11f-f8f8635f985a', function(err, response) {
                 assert(err);
                 assert.strictEqual(err.message, 'Internal Server Error');
                 assert.strictEqual(err.status, 500);
@@ -365,23 +365,23 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
             client_secret: process.env.CLIENT_SECRET
         });
 
-        const accountNumber = '5351244';
+        const pickup = '5351244';
 
-        dhlEcommerceSolutions.createManifest({ manifests: [], pickup: accountNumber }, function(err, response) {
+        dhlEcommerceSolutions.createManifest({ manifests: [], pickup }, function(err, response) {
             assert.ifError(err);
             assert.ok(response.requestId);
 
-            const manifestRequestId = response.requestId;
+            const requestId = response.requestId;
 
-            dhlEcommerceSolutions.downloadManifest({ pickup: accountNumber, requestId: manifestRequestId }, function(err, response) {
+            dhlEcommerceSolutions.downloadManifest(pickup, requestId, function(err, response) {
                 assert.ifError(err);
                 assert.ifError(response.errorCode);
                 assert.ifError(response.errorDescription);
 
                 assert.ok(response.manifestSummary);
                 assert(Number.isInteger(response.manifestSummary.total));
-                assert.strictEqual(accountNumber, response.pickup);
-                assert.strictEqual(manifestRequestId, response.requestId);
+                assert.strictEqual(pickup, response.pickup);
+                assert.strictEqual(requestId, response.requestId);
                 assert.strictEqual('COMPLETED', response.status);
                 assert.notStrictEqual(NaN, Date.parse(response.timestamp));
 
