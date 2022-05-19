@@ -7,21 +7,44 @@ function DhlEcommerceSolutions(args) {
         environment_url: 'https://api-sandbox.dhlecs.com'
     }, args);
 
-    this.applyDimensionalWeight = function(_rateRequest, dim = 166) {
-        let _dimension = _rateRequest?.packageDetail?.dimension;
-        let _weight = _rateRequest?.packageDetail?.weight;
+    this.applyDimensionalWeight = function(rateRequest, divisor = 166) {
+        let weight = rateRequest?.packageDetail?.weight?.value;
 
-        if (!_dimension?.height || !_dimension?.length || !_dimension?.width || !_dimension?.unitOfMeasure || !_weight?.value) {
+        // TODO: Convert weight to LB
+
+        // Don't use dimensional weight if the physical weight is less than or equal to 1 pound
+        if (weight <= 1) {
             return;
         }
 
-        const packageVolume = _dimension.length * _dimension.width * _dimension.height;
+        let height = rateRequest?.packageDetail?.dimension?.height;
+        let length = rateRequest?.packageDetail?.dimension?.length;
+        let width = rateRequest?.packageDetail?.dimension?.width;
 
-        // Only consider dimensional weight if the request package's volume is greater than one cubic foot (1,728 cubic inches, 28,316.8 cubic cm)
-        if (packageVolume > (_dimension.unitOfMeasure === 'IN' ? 1728 : 28316.8)) {
-            let heavierWeight = Math.max(_weight.value, (packageVolume / dim));
-            _weight.value = parseFloat(heavierWeight.toFixed(2));
+        // Convert dimenstions to inches
+        if (rateRequest?.packageDetail?.dimension?.unitOfMeasure === 'CM') {
+            height = height / 2.54;
+            length = length / 2.54;
+            width = width / 2.54;
         }
+
+        let girth = width * height * 2;
+
+        // Don't use dimensional weight if the length + girth is less than or equal to 50 inches
+        if (length + girth <= 50) {
+            return;
+        }
+
+        let volume = length * width * height;
+
+        // Only consider dimensional weight if the request package's volume is greater than one cubic foot
+        if (volume <= 1728) {
+            return;
+        }
+
+        // Use dimensional weight (if it's larger than physical weight)
+        rateRequest.packageDetail.weight.value = Number(Math.max(weight, (volume / divisor).toFixed(2)));
+        rateRequest.packageDetail.weight.unitOfMeasure = 'LB';
     };
 
     /**
