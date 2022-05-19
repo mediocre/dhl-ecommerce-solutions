@@ -64,6 +64,46 @@ dhlEcommerceSolutions.createLabel(request, { format: 'PNG' }, function(err, resp
 });
 ```
 
+### dhlEcommerceSolutions.createManifest(request, callback)
+
+Use the Manifest API to submit a request for closing out / manifesting packages and generate a Driver's Summary Manifest (DSM).
+
+https://docs.api.dhlecs.com/?version=latest#1818efe9-256d-4981-bd66-2f5e76f0cb22
+
+**Example**
+
+```javascript
+const request = {
+    manifests: [
+        {
+            dhlPackageIds: [
+                '6102010400001402',
+                '6102010400001403'
+            ]
+        }
+    ],
+    pickup: '5351244'
+};
+
+dhlEcommerceSolutions.createManifest(request, function(err, response) {
+    console.log(response);
+});
+```
+
+### dhlEcommerceSolutions.downloadManifest(pickup, requestId, callback)
+
+For Manifest requests that were created using the Create Manifest API, the Download Manifest API is used to retrieve and download the manifests.
+
+https://docs.api.dhlecs.com/?version=latest#ed99b453-b760-4a54-9fb9-7fa1fcac63ee
+
+**Example**
+
+```javascript
+dhlEcommerceSolutions.downloadManifest('5351244', 'b56fe9d0-9bce-4d62-a11f-f8f8635f985a', function(err, response) {
+    console.log(response);
+});
+```
+
 ### dhlEcommerceSolutions.findProducts(request, callback)
 
 DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates (EDD).
