@@ -7,6 +7,23 @@ function DhlEcommerceSolutions(args) {
         environment_url: 'https://api-sandbox.dhlecs.com'
     }, args);
 
+    this.applyDimensionalWeight = function(_rateRequest, dim = 166) {
+        let _dimension = _rateRequest?.packageDetail?.dimension;
+        let _weight = _rateRequest?.packageDetail?.weight;
+
+        if (!_dimension?.height || !_dimension?.length || !_dimension?.width || !_dimension?.unitOfMeasure || !_weight?.value) {
+            return;
+        }
+
+        const packageVolume = _dimension.length * _dimension.width * _dimension.height;
+
+        // Only consider dimensional weight if the request package's volume is greater than one cubic foot (1,728 cubic inches, 28,316.8 cubic cm)
+        if (packageVolume > (_dimension.unitOfMeasure === 'IN' ? 1728 : 28316.8)) {
+            let heavierWeight = Math.max(_weight.value, (packageVolume / dim));
+            _weight.value = parseFloat(heavierWeight.toFixed(2));
+        }
+    };
+
     /**
      * The Label endpoint can generate a US Domestic or an International label.
      */

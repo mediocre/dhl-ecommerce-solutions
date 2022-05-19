@@ -5,6 +5,409 @@ const cache = require('memory-cache');
 
 const DhlEcommerceSolutions = require('../index');
 
+describe.only('DhlEcommerceSolutions.applyDimensionalWeight', function() {
+    this.timeout(5000);
+
+    describe('improper input', function() {
+        it('should not return dimensional weight when request package does not contain a height', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        length: 5,
+                        width: 5,
+                        unitOfMeasure: 'IN'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB',
+                        value: 3
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(undefined, _request.packageDetail.dimension.height);
+            assert.strictEqual(5, _request.packageDetail.dimension.length);
+            assert.strictEqual(5, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(3, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not return dimensional weight when request package does not contain a weight value', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        height: 5,
+                        length: 5,
+                        width: 5,
+                        unitOfMeasure: 'IN'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB'
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(5, _request.packageDetail.dimension.height);
+            assert.strictEqual(5, _request.packageDetail.dimension.length);
+            assert.strictEqual(5, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(undefined, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+    });
+
+    describe('returns request unchanged', function() {
+        it('should not return dimensional weight when request package volume (in) is less than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        height: 11,
+                        length: 11,
+                        width: 11,
+                        unitOfMeasure: 'IN'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB',
+                        value: 3
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(11, _request.packageDetail.dimension.height);
+            assert.strictEqual(11, _request.packageDetail.dimension.length);
+            assert.strictEqual(11, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(3, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not return dimensional weight when request package volume (cm) is less than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        height: 30,
+                        length: 30,
+                        width: 30,
+                        unitOfMeasure: 'CM'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB',
+                        value: 3
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(30, _request.packageDetail.dimension.height);
+            assert.strictEqual(30, _request.packageDetail.dimension.length);
+            assert.strictEqual(30, _request.packageDetail.dimension.width);
+            assert.strictEqual('CM', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(3, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+    });
+
+    describe('returns request with dimensional weight', function() {
+        it('should return dimensional weight when request package volume (in) is greater than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        height: 12.1,
+                        length: 12.1,
+                        width: 12.1,
+                        unitOfMeasure: 'IN'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB',
+                        value: 3
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(12.1, _request.packageDetail.dimension.height);
+            assert.strictEqual(12.1, _request.packageDetail.dimension.length);
+            assert.strictEqual(12.1, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            // TODO: CHECK
+            assert.strictEqual(10.67, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should return dimensional weight when request package volume (cm) is greater than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            const _request = {
+                consigneeAddress: {
+                    address1: '114 Whitney Ave',
+                    city: 'New Haven',
+                    country: 'US',
+                    name: 'John Doe',
+                    postalCode: '06510',
+                    state: 'CT'
+                },
+                distributionCenter: 'USDFW1',
+                packageDetail: {
+                    dimension: {
+                        height: 31,
+                        length: 31,
+                        width: 31,
+                        unitOfMeasure: 'CM'
+                    },
+                    packageDescription: 'ORDER NO 20483739DFDR',
+                    packageId: 'GM60511234500000001',
+                    weight: {
+                        unitOfMeasure: 'LB',
+                        value: 3
+                    }
+                },
+                pickup: '5351244',
+                rate: {
+                    calculate: true,
+                    currency: 'USD'
+                },
+                returnAddress: {
+                    address1: '4717 Plano Parkway',
+                    address2: 'Suite 130',
+                    city: 'Carrollton',
+                    companyName: 'Mercatalyst',
+                    country: 'US',
+                    postalCode: '75010',
+                    state: 'TX'
+                }
+            };
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(31, _request.packageDetail.dimension.height);
+            assert.strictEqual(31, _request.packageDetail.dimension.length);
+            assert.strictEqual(31, _request.packageDetail.dimension.width);
+            assert.strictEqual('CM', _request.packageDetail.dimension.unitOfMeasure);
+            // TODO: CHECK
+            assert.strictEqual(179.46, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+    });
+
+    it('should allow dimensional divisor to be changed', function(done) {
+        const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+        const _request = {
+            consigneeAddress: {
+                address1: '114 Whitney Ave',
+                city: 'New Haven',
+                country: 'US',
+                name: 'John Doe',
+                postalCode: '06510',
+                state: 'CT'
+            },
+            distributionCenter: 'USDFW1',
+            packageDetail: {
+                    dimension: {
+                        height: 12.1,
+                        length: 12.1,
+                        width: 12.1,
+                        unitOfMeasure: 'IN'
+                    },
+                packageDescription: 'ORDER NO 20483739DFDR',
+                packageId: 'GM60511234500000001',
+                weight: {
+                    unitOfMeasure: 'LB',
+                    value: 3
+                }
+            },
+            pickup: '5351244',
+            rate: {
+                calculate: true,
+                currency: 'USD'
+            },
+            returnAddress: {
+                address1: '4717 Plano Parkway',
+                address2: 'Suite 130',
+                city: 'Carrollton',
+                companyName: 'Mercatalyst',
+                country: 'US',
+                postalCode: '75010',
+                state: 'TX'
+            }
+        };
+
+        dhlEcommerceSolutions.applyDimensionalWeight(_request, '200');
+
+        assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+        assert.strictEqual(12.1, _request.packageDetail.dimension.height);
+        assert.strictEqual(12.1, _request.packageDetail.dimension.length);
+        assert.strictEqual(12.1, _request.packageDetail.dimension.width);
+        assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+        // TODO: CHECK
+        assert.strictEqual(8.86, _request.packageDetail.weight.value);
+        assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+        done();
+    });
+});
+
 describe('DhlEcommerceSolutions.createLabel', function() {
     this.timeout(5000);
 
