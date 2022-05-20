@@ -8,6 +8,69 @@ function DhlEcommerceSolutions(args) {
     }, args);
 
     /**
+     * Applies dimensional weight (instead of physical weight) to a rate request if the specified weight and dimensions qualify for dimensional weight.
+     */
+    this.applyDimensionalWeight = function(rateRequest, divisor = 166) {
+        let weight = rateRequest?.packageDetail?.weight?.value;
+
+        // Convert weight to LB
+        switch (rateRequest?.packageDetail?.weight?.unitOfMeasure) {
+            case 'G':
+                weight /= 453.592;
+                break;
+            case 'KG':
+                weight *= 2.205;
+                break;
+            case 'LB':
+                break;
+            case 'OZ':
+                weight /= 16;
+                break;
+            default:
+                return;
+        }
+
+        // Don't use dimensional weight if the physical weight is less than or equal to 1 pound
+        if (!weight || weight <= 1) {
+            return;
+        }
+
+        if (!rateRequest?.packageDetail?.dimension?.height || !rateRequest?.packageDetail?.dimension?.length || !rateRequest?.packageDetail?.dimension?.width || !rateRequest?.packageDetail?.dimension?.unitOfMeasure) {
+            return;
+        }
+
+        let height = rateRequest.packageDetail.dimension.height;
+        let length = rateRequest.packageDetail.dimension.length;
+        let width = rateRequest.packageDetail.dimension.width;
+
+        // Convert dimensions to inches
+        if (rateRequest.packageDetail.dimension.unitOfMeasure === 'CM') {
+            height /= 2.54;
+            length /= 2.54;
+            width /= 2.54;
+        }
+
+        // Calculate girth: https://www.dhl.com/us-en/home/ecommerce-solutions/shipping-services.html
+        const girth = (2 * width) + (2 * height);
+
+        // Don't use dimensional weight if the length + girth is less than or equal to 50 inches
+        if (length + girth <= 50) {
+            return;
+        }
+
+        const volume = length * width * height;
+
+        // Don't use dimensional weight if the volume is less than or equal to one cubic foot
+        if (volume <= 1728) {
+            return;
+        }
+
+        // Use dimensional weight (if it's larger than physical weight)
+        rateRequest.packageDetail.weight.value = Number(Math.max(weight, (volume / divisor)).toFixed(2));
+        rateRequest.packageDetail.weight.unitOfMeasure = 'LB';
+    };
+
+    /**
      * The Label endpoint can generate a US Domestic or an International label.
      */
      this.createLabel = function(_request, _options, callback) {

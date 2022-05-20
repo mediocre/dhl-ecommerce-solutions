@@ -5,6 +5,393 @@ const cache = require('memory-cache');
 
 const DhlEcommerceSolutions = require('../index');
 
+describe('DhlEcommerceSolutions.applyDimensionalWeight', function() {
+    this.timeout(5000);
+
+    let _request = {};
+
+    beforeEach(function() {
+        _request = {
+            consigneeAddress: {
+                address1: '114 Whitney Ave',
+                city: 'New Haven',
+                country: 'US',
+                name: 'John Doe',
+                postalCode: '06510',
+                state: 'CT'
+            },
+            distributionCenter: 'USDFW1',
+            packageDetail: {
+                dimension: {
+                    height: 14,
+                    length: 14,
+                    width: 14,
+                    unitOfMeasure: 'IN'
+                },
+                packageDescription: 'ORDER NO 20483739DFDR',
+                packageId: 'GM60511234500000001',
+                weight: {
+                    unitOfMeasure: 'LB',
+                    value: 5
+                }
+            },
+            pickup: '5351244',
+            rate: {
+                calculate: true,
+                currency: 'USD'
+            },
+            returnAddress: {
+                address1: '4717 Plano Parkway',
+                address2: 'Suite 130',
+                city: 'Carrollton',
+                companyName: 'Mercatalyst',
+                country: 'US',
+                postalCode: '75010',
+                state: 'TX'
+            }
+        };
+    });
+
+    describe('should not set request weight equal to dimensional weight', function() {
+        it('should not set request weight equal to dimensional weight when request does not contain a weight unit of measure', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            delete _request.packageDetail.weight.unitOfMeasure;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual(undefined, _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request unitOfMeasure is not LB, OZ, KG or G', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.unitOfMeasure = 'T';
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('T', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request does not contain a weight value', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            delete _request.packageDetail.weight.value;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(undefined, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request weight is less than 1lb', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.value = .5;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(.5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request does not contain a height', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            delete _request.packageDetail.dimension.height;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(undefined, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request does not contain a dimension unit of measure', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            delete _request.packageDetail.dimension.unitOfMeasure;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual(undefined, _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request length + girth is less than 50 inches', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.dimension.height = 5;
+            _request.packageDetail.dimension.length = 5;
+            _request.packageDetail.dimension.width = 5;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(5, _request.packageDetail.dimension.height);
+            assert.strictEqual(5, _request.packageDetail.dimension.length);
+            assert.strictEqual(5, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request volume (in) is less than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.dimension.height = 1;
+            _request.packageDetail.dimension.length = 1;
+            _request.packageDetail.dimension.width = 25;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(1, _request.packageDetail.dimension.height);
+            assert.strictEqual(1, _request.packageDetail.dimension.length);
+            assert.strictEqual(25, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when request volume (cm) is less than 1 cubic foot', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.dimension.height = 3;
+            _request.packageDetail.dimension.length = 3;
+            _request.packageDetail.dimension.width = 64;
+            _request.packageDetail.dimension.unitOfMeasure = 'CM';
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(3, _request.packageDetail.dimension.height);
+            assert.strictEqual(3, _request.packageDetail.dimension.length);
+            assert.strictEqual(64, _request.packageDetail.dimension.width);
+            assert.strictEqual('CM', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(5, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when weight is larger than dimensional weight', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.value = 50;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(50, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should not set request weight equal to dimensional weight when weight is larger than dimensional weight (kg)', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.value = 50;
+            _request.packageDetail.weight.unitOfMeasure = 'KG';
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(110.25, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+    });
+
+    describe('should set request weight equal to dimensional weight', function() {
+        it('should set dimensional weight when request unit of mesaure is inches', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(16.53, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should set dimensional weight when request unit of mesaure is cm', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.dimension.height = 40;
+            _request.packageDetail.dimension.length = 40;
+            _request.packageDetail.dimension.width = 40;
+            _request.packageDetail.dimension.unitOfMeasure = 'CM';
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(40, _request.packageDetail.dimension.height);
+            assert.strictEqual(40, _request.packageDetail.dimension.length);
+            assert.strictEqual(40, _request.packageDetail.dimension.width);
+            assert.strictEqual('CM', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(23.53, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should set dimensional weight when request weight is in LB', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.unitOfMeasure = 'LB';
+            _request.packageDetail.weight.value = 12;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(16.53, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should set dimensional weight when request weight is in OZ', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.unitOfMeasure = 'OZ';
+            _request.packageDetail.weight.value = 100;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(16.53, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should set dimensional weight when request weight is in KG', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.unitOfMeasure = 'KG';
+            _request.packageDetail.weight.value = 10;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(22.05, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should set dimensional weight when request weight is in G', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            _request.packageDetail.weight.unitOfMeasure = 'G';
+            _request.packageDetail.weight.value = 2500;
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request);
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(16.53, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+
+        it('should allow dimensional divisor to be changed', function(done) {
+            const dhlEcommerceSolutions = new DhlEcommerceSolutions({});
+
+            dhlEcommerceSolutions.applyDimensionalWeight(_request, '200');
+
+            assert.strictEqual('GM60511234500000001', _request.packageDetail.packageId);
+            assert.strictEqual(14, _request.packageDetail.dimension.height);
+            assert.strictEqual(14, _request.packageDetail.dimension.length);
+            assert.strictEqual(14, _request.packageDetail.dimension.width);
+            assert.strictEqual('IN', _request.packageDetail.dimension.unitOfMeasure);
+            assert.strictEqual(13.72, _request.packageDetail.weight.value);
+            assert.strictEqual('LB', _request.packageDetail.weight.unitOfMeasure);
+
+            done();
+        });
+    });
+});
+
 describe('DhlEcommerceSolutions.createLabel', function() {
     this.timeout(5000);
 
@@ -382,7 +769,7 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
                 assert(Number.isInteger(response.manifestSummary.total));
                 assert.strictEqual(pickup, response.pickup);
                 assert.strictEqual(requestId, response.requestId);
-                assert.strictEqual('COMPLETED', response.status);
+                assert.strictEqual(['CREATED', 'IN_PROGRESS', 'COMPLETED'].includes(response.status), true);
                 assert.notStrictEqual(NaN, Date.parse(response.timestamp));
 
                 done();
