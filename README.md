@@ -21,7 +21,7 @@ const dhlEcommerceSolutions = new DhlEcommerceSolutions({
 
 ### dhlEcommerceSolutions.applyDimensionalWeight(request, [divisor])
 
-This method applies the dimensional weight formula to a request. The request weight will be set to the dimensional weight if the dimensional weight activation conditions are met.
+Applies dimensional weight (instead of physical weight) to a rate request if the specified weight and dimensions qualify for dimensional weight.
 
 **Example**
 

@@ -7,21 +7,24 @@ function DhlEcommerceSolutions(args) {
         environment_url: 'https://api-sandbox.dhlecs.com'
     }, args);
 
+    /**
+     * Applies dimensional weight (instead of physical weight) to a rate request if the specified weight and dimensions qualify for dimensional weight.
+     */
     this.applyDimensionalWeight = function(rateRequest, divisor = 166) {
         let weight = rateRequest?.packageDetail?.weight?.value;
 
         // Convert weight to LB
         switch (rateRequest?.packageDetail?.weight?.unitOfMeasure) {
+            case 'G':
+                weight /= 453.592;
+                break;
+            case 'KG':
+                weight *= 2.205;
+                break;
             case 'LB':
                 break;
             case 'OZ':
-                weight = weight / 16;
-                break;
-            case 'KG':
-                weight = weight * 2.205;
-                break;
-            case 'G':
-                weight = weight / 453.592;
+                weight /= 16;
                 break;
             default:
                 return;
@@ -42,20 +45,20 @@ function DhlEcommerceSolutions(args) {
 
         // Convert dimensions to inches
         if (rateRequest.packageDetail.dimension.unitOfMeasure === 'CM') {
-            height = height / 2.54;
-            length = length / 2.54;
-            width = width / 2.54;
+            height /= 2.54;
+            length /= 2.54;
+            width /= 2.54;
         }
 
-        // girth formula https://www.dhl.com/us-en/home/ecommerce-solutions/shipping-services.html
-        let girth = (2 * width) + (2 * height);
+        // Calculate girth: https://www.dhl.com/us-en/home/ecommerce-solutions/shipping-services.html
+        const girth = (2 * width) + (2 * height);
 
         // Don't use dimensional weight if the length + girth is less than or equal to 50 inches
         if (length + girth <= 50) {
             return;
         }
 
-        let volume = length * width * height;
+        const volume = length * width * height;
 
         // Don't use dimensional weight if the volume is less than or equal to one cubic foot
         if (volume <= 1728) {
