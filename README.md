@@ -19,6 +19,53 @@ const dhlEcommerceSolutions = new DhlEcommerceSolutions({
 });
 ```
 
+### dhlEcommerceSolutions.applyDimensionalWeight(request, [divisor])
+
+This method applies the dimensional weight formula to a request. The request weight will be set to the dimensional weight if the dimensional weight activation conditions are met.
+
+**Example**
+
+```javascript
+const request = {
+    consigneeAddress: {
+        address1: '114 Whitney Ave',
+        city: 'New Haven',
+        country: 'US',
+        name: 'John Doe',
+        postalCode: '06510',
+        state: 'CT'
+    },
+    distributionCenter: 'USDFW1',
+    orderedProductId: 'GND',
+    packageDetail: {
+        dimension: {
+            height: 14,
+            length: 14,
+            width: 14,
+            unitOfMeasure: 'IN'
+        },
+        packageDescription: 'ORDER NO 20483739DFDR',
+        packageId: 'GM60511234500000001',
+        weight: {
+            unitOfMeasure: 'LB',
+            value: 5
+        }
+    },
+    pickup: '5351244',
+    returnAddress: {
+        address1: '4717 Plano Parkway',
+        address2: 'Suite 130',
+        city: 'Carrollton',
+        companyName: 'Mercatalyst',
+        country: 'US',
+        postalCode: '75010',
+        state: 'TX'
+    }
+};
+
+dhlEcommerceSolutions.applyDimensionalWeight(request);
+```
+
 ### dhlEcommerceSolutions.createLabel(request, options, callback)
 
 The Label endpoint can generate a US Domestic or an International label.
