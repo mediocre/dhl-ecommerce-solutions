@@ -10,25 +10,45 @@ function DhlEcommerceSolutions(args) {
     this.applyDimensionalWeight = function(rateRequest, divisor = 166) {
         let weight = rateRequest?.packageDetail?.weight?.value;
 
-        // TODO: Convert weight to LB
+        // Convert weight to LB
+        switch (rateRequest?.packageDetail?.weight?.unitOfMeasure) {
+            case 'LB':
+                break;
+            case 'OZ':
+                weight = weight / 16;
+                break;
+            case 'KG':
+                weight = weight * 2.205;
+                break;
+            case 'G':
+                weight = weight / 453.592;
+                break;
+            default:
+                return;
+        }
 
         // Don't use dimensional weight if the physical weight is less than or equal to 1 pound
-        if (weight <= 1) {
+        if (!weight || weight <= 1) {
             return;
         }
 
-        let height = rateRequest?.packageDetail?.dimension?.height;
-        let length = rateRequest?.packageDetail?.dimension?.length;
-        let width = rateRequest?.packageDetail?.dimension?.width;
+        if (!rateRequest?.packageDetail?.dimension?.height || !rateRequest?.packageDetail?.dimension?.length || !rateRequest?.packageDetail?.dimension?.width || !rateRequest?.packageDetail?.dimension?.unitOfMeasure) {
+            return;
+        }
 
-        // Convert dimenstions to inches
-        if (rateRequest?.packageDetail?.dimension?.unitOfMeasure === 'CM') {
+        let height = rateRequest.packageDetail.dimension.height;
+        let length = rateRequest.packageDetail.dimension.length;
+        let width = rateRequest.packageDetail.dimension.width;
+
+        // Convert dimensions to inches
+        if (rateRequest.packageDetail.dimension.unitOfMeasure === 'CM') {
             height = height / 2.54;
             length = length / 2.54;
             width = width / 2.54;
         }
 
-        let girth = width * height * 2;
+        // girth formula https://www.dhl.com/us-en/home/ecommerce-solutions/shipping-services.html
+        let girth = (2 * width) + (2 * height);
 
         // Don't use dimensional weight if the length + girth is less than or equal to 50 inches
         if (length + girth <= 50) {
@@ -37,13 +57,13 @@ function DhlEcommerceSolutions(args) {
 
         let volume = length * width * height;
 
-        // Only consider dimensional weight if the request package's volume is greater than one cubic foot
+        // Don't use dimensional weight if the volume is less than or equal to one cubic foot
         if (volume <= 1728) {
             return;
         }
 
         // Use dimensional weight (if it's larger than physical weight)
-        rateRequest.packageDetail.weight.value = Number(Math.max(weight, (volume / divisor).toFixed(2)));
+        rateRequest.packageDetail.weight.value = Number(Math.max(weight, (volume / divisor)).toFixed(2));
         rateRequest.packageDetail.weight.unitOfMeasure = 'LB';
     };
 
