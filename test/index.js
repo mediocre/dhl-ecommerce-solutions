@@ -769,7 +769,7 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
                 assert(Number.isInteger(response.manifestSummary.total));
                 assert.strictEqual(pickup, response.pickup);
                 assert.strictEqual(requestId, response.requestId);
-                assert.strictEqual('COMPLETED', response.status);
+                assert.strictEqual(['CREATED', 'IN_PROGRESS', 'COMPLETED'].includes(response.status), true);
                 assert.notStrictEqual(NaN, Date.parse(response.timestamp));
 
                 done();
