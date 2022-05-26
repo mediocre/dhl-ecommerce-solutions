@@ -1159,7 +1159,7 @@ describe('DhlEcommerceSolutions.getTrackingByTrackingId', function() {
         });
     });
 
-    it.only('should return a response', function(done) {
+    it('should return a response', function(done) {
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET

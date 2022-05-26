@@ -303,7 +303,7 @@ function DhlEcommerceSolutions(args) {
     /**
      * Track using a single trackingId.
      */
-     this.getTrackingByTrackingId = function(trackingId, callback) {
+    this.getTrackingByTrackingId = function(trackingId, callback) {
         this.getAccessToken(function(err, accessToken) {
             if (err) {
                 return callback(err);
