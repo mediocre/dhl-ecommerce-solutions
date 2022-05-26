@@ -299,6 +299,40 @@ function DhlEcommerceSolutions(args) {
             });
         });
     };
+
+    /**
+     * Track using a single trackingId.
+     */
+    this.getTrackingByTrackingId = function(trackingId, callback) {
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: true,
+                url: `${options.environment_url}/tracking/v4/package?trackingId=${trackingId}`
+            };
+
+            request.get(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    const err = createError(res.statusCode);
+                    err.response = response;
+
+                    return callback(err);
+                }
+
+                callback(null, response);
+            });
+        });
+    };
 }
 
 module.exports = DhlEcommerceSolutions;
