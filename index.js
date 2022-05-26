@@ -73,7 +73,7 @@ function DhlEcommerceSolutions(args) {
     /**
      * The Label endpoint can generate a US Domestic or an International label.
      */
-     this.createLabel = function(_request, _options, callback) {
+    this.createLabel = function(_request, _options, callback) {
         // Options are optional
         if (typeof _options === 'function') {
             callback = _options;
@@ -189,7 +189,7 @@ function DhlEcommerceSolutions(args) {
     /**
      * DHL eCommerce Americas Product Finder API enables clients to determine which DHL shipping products are suitable for a given shipping request including associated rates and estimated delivery dates.
      */
-     this.findProducts = function(_request, callback) {
+    this.findProducts = function(_request, callback) {
         this.getAccessToken(function(err, accessToken) {
             if (err) {
                 return callback(err);
