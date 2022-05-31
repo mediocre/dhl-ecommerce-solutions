@@ -333,6 +333,40 @@ function DhlEcommerceSolutions(args) {
             });
         });
     };
+
+    /**
+     * Retrieve a list of all webhooks owned by the current API credentials
+     */
+    this.listWebhooks = function(callback) {
+        this.getAccessToken(function(err, accessToken) {
+            if (err) {
+                return callback(err);
+            }
+
+            const req = {
+                auth: {
+                    bearer: accessToken.access_token
+                },
+                json: true,
+                url: `${options.environment_url}/account/v4/webhooks`
+            };
+
+            request.get(req, function(err, res, response) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    const err = createError(res.statusCode);
+                    err.response = response;
+
+                    return callback(err);
+                }
+
+                callback(null, response);
+            });
+        });
+    };
 }
 
 module.exports = DhlEcommerceSolutions;
