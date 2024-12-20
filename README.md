@@ -53,8 +53,8 @@ const request = {
     },
     pickup: '5351244',
     returnAddress: {
-        address1: '4717 Plano Parkway',
-        address2: 'Suite 130',
+        address1: '1950 Parker Road',
+        address2: 'Receiving Door 32',
         city: 'Carrollton',
         companyName: 'Mercatalyst',
         country: 'US',
@@ -96,8 +96,8 @@ const request = {
     },
     pickup: '5351244',
     returnAddress: {
-        address1: '4717 Plano Parkway',
-        address2: 'Suite 130',
+        address1: '1950 Parker Road',
+        address2: 'Receiving Door 32',
         city: 'Carrollton',
         companyName: 'Mercatalyst',
         country: 'US',
@@ -184,8 +184,8 @@ const request = {
         currency: 'USD'
     },
     returnAddress: {
-        address1: '4717 Plano Parkway',
-        address2: 'Suite 130',
+        address1: '1950 Parker Road',
+        address2: 'Receiving Door 32',
         city: 'Carrollton',
         companyName: 'Mercatalyst',
         country: 'US',
