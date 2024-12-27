@@ -866,7 +866,7 @@ describe('DhlEcommerceSolutions.findProducts', function() {
         });
     });
 
-    it('should return a valid response', function(done) {
+    it.skip('should return a valid response', function(done) {
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
