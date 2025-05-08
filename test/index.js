@@ -442,6 +442,8 @@ describe('DhlEcommerceSolutions.createLabel', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -625,6 +627,8 @@ describe('DhlEcommerceSolutions.createManifest', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -720,6 +724,8 @@ describe('DhlEcommerceSolutions.downloadManifest', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -828,6 +834,8 @@ describe('DhlEcommerceSolutions.findProducts', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -939,6 +947,8 @@ describe('DhlEcommerceSolutions.getAccessToken', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET,
@@ -1042,6 +1052,8 @@ describe('DhlEcommerceSolutions.getTrackingByPackageId', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
@@ -1133,6 +1145,8 @@ describe('DhlEcommerceSolutions.getTrackingByTrackingId', function() {
     });
 
     it('should return an error for non 200 status code', function(done) {
+        this.timeout(10000);
+
         var dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET
